@@ -152,7 +152,6 @@ const updateMovie = async (request: Request, response: Response): Promise<Respon
 
   try {
     const queryResult: MovieQueryResult = await client.query(queryConfig);
-    console.log(queryResult);
     return response.status(200).json(queryResult.rows[0]);
   } catch (error) {
     return response.status(409).json({

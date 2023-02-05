@@ -11,6 +11,8 @@ interface IMovie extends IMovieRequest {
   id: number;
 }
 
+type IListRequiredKeys = "name" | "duration" | "price" | "description" | string
+
 type MovieQueryResult = QueryResult<IMovie>;
 
-export { IMovieRequest, IMovie, MovieQueryResult };
+export { IMovieRequest, IMovie, MovieQueryResult, IListRequiredKeys };

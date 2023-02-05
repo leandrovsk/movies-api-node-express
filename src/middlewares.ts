@@ -1,7 +1,41 @@
 import { Request, Response, NextFunction, request } from "express";
 import { QueryConfig } from "pg";
 import { client } from "./database";
-import { MovieQueryResult } from "./interfaces";
+import { IListRequiredKeys, MovieQueryResult } from "./interfaces";
+
+const validateBodyMiddleware = (request: Request, response: Response, next: NextFunction): Response | void => {
+
+  const keys: Array<string> = Object.keys(request.body)
+  const values: Array<string> = Object.values(request.body)
+  const requiredKeys: Array<IListRequiredKeys> = ["name", "duration", "price"]
+  const requiredKeysExtra: Array<IListRequiredKeys> = ["name", "duration", "price", "description"]
+  
+  const validateKeys: boolean = requiredKeys.every((key:IListRequiredKeys) => keys.includes(key))
+  const catchWrongKeys: boolean = keys.some((key:string) => !requiredKeysExtra.includes(key))
+  const catchEmptyValues: boolean = values.some((value: string) => value === "")
+
+  if(request.method === 'POST') {
+    if(!validateKeys) {
+      return response.status(400).json({
+        message: `Error: required keys are ${requiredKeysExtra}`
+      })
+    }
+  }
+
+  if(catchWrongKeys) {
+    return response.status(400).json({
+      message: `Error: wrong key name`
+    })
+  }
+
+  if(catchEmptyValues) {
+    return response.status(400).json({
+      message: "Error: empty value field"
+    })
+  }
+
+  return next()
+}
 
 const ensureMovieExists = async (request: Request, response: Response, next: NextFunction): Promise<Response | void> => {
   const id: number = parseInt(request.params.id);
@@ -37,4 +71,4 @@ const ensureMovieExists = async (request: Request, response: Response, next: Nex
   }
 };
 
-export { ensureMovieExists };
+export { ensureMovieExists, validateBodyMiddleware };
